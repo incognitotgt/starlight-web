@@ -37,19 +37,19 @@ export default function RootLayout({
 					disableTransitionOnChange
 				>
 					{children}
-					<footer className="flex justify-center items-center flex-row gap-4 bg-sidebar p-4">
+					<footer className="flex justify-center items-center flex-row gap-4 bg-sidebar p-4 h-12">
 						<Button asChild variant="link">
 							<Link
 								className="flex flex-row gap-1"
 								href={`https://github.com/incognitotgt/starlight-web/commit/${process.env.GIT_COMMIT}`}
 							>
 								<GitCommit />
-								{process.env.GIT_COMMIT}
+								{process.env.GIT_COMMIT?.slice(0, 7)}
 							</Link>
 						</Button>
 						<div className="flex flex-row gap-1">
 							<CalendarCog />
-							{process.env.BUILD_DATE}
+							{new Date(Number(process.env.BUILD_DATE)).toLocaleString()}
 						</div>
 					</footer>
 				</ThemeProvider>

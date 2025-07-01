@@ -1,10 +1,17 @@
-import { CheckCircle, MonitorSmartphone, Signpost } from "lucide-react";
+import { CheckCircle, LayoutDashboard, LogOut, MonitorSmartphone, Signpost } from "lucide-react";
+import { headers } from "next/headers";
 import Link from "next/link";
+import { redirect, unstable_rethrow } from "next/navigation";
 import { StarlightIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { auth } from "@/lib/auth";
 
-export default function Home() {
+export default async function Home() {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	});
 	return (
 		<main className="flex flex-col justify-center items-center px-20 pt-8 h-screen">
 			<div className="flex flex-row gap-2 items-center">
@@ -41,13 +48,61 @@ export default function Home() {
 						</Card>
 					))}
 				</div>
-				<Button asChild size="lg">
-					<Link href="/auth/signup">
-						<Signpost />
-						Get Started
-					</Link>
-				</Button>
+				<Separator />
+				{session ? (
+					<div className="flex flex-col gap-2 py-2 font-bold">
+						Welcome, {session.user.name || session.user.email.split("@")[0]}
+						<Button asChild size="lg">
+							<Link href="/app">
+								<LayoutDashboard />
+								Dashboard
+							</Link>
+						</Button>
+						<Button asChild size="lg" variant="secondary">
+							<Link href="/auth/signout">
+								<LogOut />
+								Sign Out
+							</Link>
+						</Button>
+					</div>
+				) : (
+					<form
+						action={async () => {
+							"use server";
+							try {
+								const res = await auth.api.signInSocial({
+									body: {
+										provider: "github",
+									},
+								});
+								if (!res.url) throw new Error("No URL returned");
+								const url = new URL(res.url);
+								const { get } = await headers();
+								const proto = get("x-forwarded-proto");
+								const host = get("x-forwarded-host");
+								const redirect_uri = new URL(url.searchParams.get("redirect_uri") as string);
+								if (proto && host) {
+									redirect_uri.protocol = proto;
+									redirect_uri.host = host;
+									redirect_uri.port = ""; // normally when those headers exist it's from behind a reverse proxy that goes to 443 or wtv the default port is
+								}
+								url.searchParams.set("redirect_uri", redirect_uri.href);
+								redirect(url.href);
+							} catch (error) {
+								unstable_rethrow(error);
+								redirect(`/auth/signin?error=${(error as Error).message}`);
+							}
+						}}
+						className="flex flex-col gap-2 py-2 font-bold"
+					>
+						<Button type="submit" size="lg">
+							<Signpost />
+							Sign up/log in
+						</Button>
+					</form>
+				)}
 			</div>
 		</main>
 	);
 }
+export const experimental_ppr = true;
