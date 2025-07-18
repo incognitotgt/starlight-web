@@ -8,9 +8,6 @@ export const server = pgTable("server", {
 	id: text("id").primaryKey(),
 	autoLogin: boolean("autoLogin").default(false),
 	password: text("password").notNull(),
-	nostr: text("nostr")
-		.notNull()
-		.default(process.env.NOSTR_URL || "nostr.spaceness.team"),
 	userId: text("userId")
 		.notNull()
 		.references(() => user.id),
