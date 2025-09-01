@@ -2,10 +2,11 @@
 	"name": "starlight-web",
 	"version": "0.1.0",
 	"private": true,
+	"type": "module",
 	"scripts": {
-		"dev": "next dev --turbopack",
+		"dev": "tsx server.ts",
 		"build": "next build",
-		"start": "next start",
+		"start": "NODE_ENV=production tsx server.ts",
 		"check": "biome check --write",
 		"drizzle": "drizzle-kit",
 		"shadcn": "shadcn"
@@ -29,7 +30,9 @@
 		"next-themes": "^0.4.6",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
-		"tailwind-merge": "^3.3.1"
+		"tailwind-merge": "^3.3.1",
+		"tsx": "^4.20.3",
+		"ws": "^8.18.3"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.0.5",
@@ -39,6 +42,7 @@
 		"@types/novnc__novnc": "^1.5.0",
 		"@types/react": "^19",
 		"@types/react-dom": "^19",
+		"@types/ws": "^8.18.1",
 		"drizzle-kit": "^0.31.2",
 		"shadcn": "^2.7.0",
 		"tailwindcss": "^4",
